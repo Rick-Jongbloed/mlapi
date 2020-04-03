@@ -17,3 +17,5 @@ models/
 # due to using tox and pytest
 .tox
 .cache
+.vscode
+.ipynb_checkpoints
