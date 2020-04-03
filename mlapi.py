@@ -25,6 +25,9 @@ import modules.utils as utils
 
 from modules.__init__ import __version__
 
+# If debug:
+import datetime
+
 # Test for TF
 from PIL import Image
 
@@ -36,7 +39,9 @@ def file_ext(str):
 def allowed_ext(ext):
     return ext.lower() in g.ALLOWED_EXTENSIONS
 
-# Assigns a unique name to the image and saves it locally for analysis
+# Assigns a unique name to the image and saves it locally for analysis  
+# -- Find out why this is required. The image shouldn't be saved but send back?
+# -- or the detection should be etched in the file
 
 def parse_args():
 
@@ -85,14 +90,14 @@ def get_file(args):
                 ext = '.jpg'
             g.log.debug ('extension {} derived from {}'.format(ext,ct))
             if not allowed_ext(ext):
-                abort(400, msg='filetype {} not allowed'.format(ext))        
+                abort(400, msg='filetype {} not allowed'.format(ext))
         else:
             ext = '.jpg'
         open(file_with_path_no_ext+ext, 'wb').write(r.content)
     else:
         abort(400, msg='could not determine file type')
 
-    g.log.debug ('get_file returned: {}{}'.format(file_with_path_no_ext,ext))
+    g.log.debug ('get_file returnedget_file returned: {}{}'.format(file_with_path_no_ext,ext))
     return file_with_path_no_ext, ext
 
 # general argument processing
@@ -126,8 +131,16 @@ class Detect(Resource):
         
         # use cv2 for opencv, pillow for edgetpu
         #image = cv2.imread(fi)
+        start = datetime.datetime.now()
+        # g.log.debug ('Loading image with PIL')
         image = Image.open(fi)
+        diff_time = (datetime.datetime.now() - start).microseconds/1000
+        g.logger.debug ('Loading image with PIL took: {} milliseconds'.format(diff_time))
+        start = datetime.datetime.now()
+        # g.log.debug ('Start Detection objects')
         detections = m.detect(image)
+        diff_time = (datetime.datetime.now() - start).microseconds/1000
+        g.logger.debug ('Detecting objects took: {} milliseconds'.format(diff_time))
         if args['delete']:
             os.remove(fi)
         return detections
