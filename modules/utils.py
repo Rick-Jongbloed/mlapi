@@ -92,6 +92,22 @@ def process_config(args):
         exit(0)
 
 def download_models():
+    if g.config['use_tflite_edgetpu'] == 'yes':
+        labels_file_abs_path = g.config['edgetpu_mobilenet_ssd_labels']
+        if not os.path.exists(labels_file_abs_path):
+            (p,f) = os.path.split(labels_file_abs_path)
+            download_file('https://dl.google.com/coral/canned_models/coco_labels.txt',f,p)
+        if g.config['edgetpu_mobilenet_ssd_type'] == 'v1':
+            model_file_abs_path = g.config['edgetpu_mobilenet_ssd_model_v1']
+            if not os.path.exists(model_file_abs_path):
+                (p,f) = os.path.split(model_file_abs_path)
+                download_file('https://github.com/google-coral/edgetpu/raw/master/test_data/ssd_mobilenet_v1_coco_quant_postprocess_edgetpu.tflite',f,p)
+        else:
+            model_file_abs_path = g.config['edgetpu_mobilenet_ssd_model_v2']
+            if not os.path.exists(model_file_abs_path):
+                (p,f) = os.path.split(model_file_abs_path)
+                download_file('https://github.com/google-coral/edgetpu/raw/master/test_data/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite',f,p)
+
     if g.config['yolo_type'] == 'tiny':
         config_file_abs_path = g.config['tiny_config']
         weights_file_abs_path = g.config['tiny_weights']

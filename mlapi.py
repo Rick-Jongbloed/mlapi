@@ -7,6 +7,7 @@ from werkzeug.security import safe_str_cmp
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException, default_exceptions
 from werkzeug.datastructures import FileStorage
+
 from functools import wraps
 from mimetypes import guess_extension
 #from collections import deque 
@@ -21,8 +22,11 @@ import argparse
 import modules.common_params as g
 import modules.db as Database
 import modules.utils as utils
+
 from modules.__init__ import __version__
 
+# Test for TF
+from PIL import Image
 
 def file_ext(str):
     f,e = os.path.splitext(str)
@@ -90,17 +94,14 @@ def get_file(args):
 
     g.log.debug ('get_file returned: {}{}'.format(file_with_path_no_ext,ext))
     return file_with_path_no_ext, ext
+
 # general argument processing
-
-
-
-
-
 class Detect(Resource):
     @jwt_required
     def post(self):
         args = parse_args()
-
+        g.log.debug (args)
+        # Implement several endpoints here, one endpoint per module
         if args['type'] == 'face_names':
             g.log.debug ('List of face names requested')
             print (face_obj.get_classes())
@@ -112,7 +113,8 @@ class Detect(Resource):
         if args['type'] == 'face':
             m = face_obj
             g.log.debug ('Face Recognition requested')
-           
+        
+        
         elif args['type'] in [None, 'object']:
             m = od_obj
             g.log.debug ('Object Recognition requested')
@@ -121,7 +123,10 @@ class Detect(Resource):
             abort(400, msg='Invalid Model:{}'.format(args['type']))
         fip,ext = get_file(args)
         fi = fip+ext
-        image = cv2.imread(fi)
+        
+        # use cv2 for opencv, pillow for edgetpu
+        #image = cv2.imread(fi)
+        image = Image.open(fi)
         detections = m.detect(image)
         if args['delete']:
             os.remove(fi)
@@ -186,26 +191,25 @@ app.config['MAX_CONTENT_LENGTH'] = g.MAX_FILE_SIZE_MB * 1024 * 1024
 app.config['JWT_SECRET_KEY'] = g.config['mlapi_secret_key']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = g.ACCESS_TOKEN_EXPIRES
 app.config['PROPAGATE_EXCEPTIONS'] = True
-app.debug = False
+app.debug = True     #should make this a switch
 jwt = JWTManager(app)
 
 db = Database.Database()
 
 api.add_resource(Login, '/login')
 api.add_resource(Detect, '/detect/object')
+#api.add_resource(Detect, '/detect/object_tpu')
 api.add_resource(Health, '/health')
 utils.download_models()
 
 
 import modules.face_recognition as FaceRecog
-import modules.object as ObjectDetect
+#import modules.object_opencv_yolo as ObjectDetectOpenCvYolo
+import modules.object_edgetpu_ssd_mobilenet as ObjectDetectEdgeTpuSsdMobileNet
 
 face_obj = FaceRecog.Face()
-od_obj = ObjectDetect.Object()
+od_obj = ObjectDetectEdgeTpuSsdMobileNet.Object()
 #q = deque()
-
-
-
 
 if __name__ == '__main__':
     g.log.info ('--------| mlapi version:{} |--------'.format(__version__))

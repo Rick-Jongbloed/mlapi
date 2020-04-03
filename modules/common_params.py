@@ -47,14 +47,17 @@ config_vals = {
             'section':'ml',
             'default':'no',
             'type':'string'
-
+        },
+        'use_tflite_edgetpu':{
+            'section':'ml',
+            'default':'no',
+            'type':'string'
         },
         # YOLO
         'yolo_type':{
             'section':'yolo',
             'default':'full',
             'type':'string'
-
         },
         'yolo_min_confidence': {
             'section': 'yolo',
@@ -89,6 +92,32 @@ config_vals = {
         'tiny_labels':{
             'section': 'yolo',
             'default': './models/tinyyolo/yolov3-tiny.txt',
+            'type': 'string'
+        },
+        # EdgeTPU SSD Mobilenet
+        'edgetpu_mobilenet_ssd_type':{
+            'section':'edgetpu_mobilenet_ssd',
+            'default':'v2',
+            'type':'string'
+        },
+        'edgetpu_mobilenet_ssd_min_confidence': {
+            'section': 'yolo',
+            'default': '0.4',
+            'type': 'float'
+        },
+        'edgetpu_mobilenet_ssd_labels':{
+            'section': 'edgetpu_mobilenet_ssd',
+            'default': './models/mobilenet-ssd-edgetpu/coco_labels.txt',
+            'type': 'string'
+        },
+        'edgetpu_mobilenet_ssd_model_v1':{
+            'section': 'edgetpu_mobilenet_ssd',
+            'default': './models/mobilenet-ssd-edgetpu/ssd_mobilenet_v1_coco_quant_postprocess_edgetpu.tflite',
+            'type': 'string'
+        },
+        'edgetpu_mobilenet_ssd_model_v2':{
+            'section': 'edgetpu_mobilenet_ssd',
+            'default': './models/mobilenet-ssd-edgetpu/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite',
             'type': 'string'
         },
         # Face
