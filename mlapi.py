@@ -132,7 +132,8 @@ class Detect(Resource):
         # use cv2 for opencv, pillow for edgetpu
         #image = cv2.imread(fi)
         start = datetime.datetime.now()
-        # g.log.debug ('Loading image with PIL')
+        g.log.debug ('Loading image with PIL: {}'.format(fi))
+
         image = Image.open(fi)
         diff_time = (datetime.datetime.now() - start).microseconds/1000
         g.logger.debug ('Loading image with PIL took: {} milliseconds'.format(diff_time))

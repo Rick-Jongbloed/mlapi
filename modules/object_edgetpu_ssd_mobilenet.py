@@ -19,7 +19,6 @@ class Object:
         self.classes = dataset_utils.read_label_file(g.config['edgetpu_mobilenet_ssd_labels'])           # Returns object x <todo>
 
     def detect(self, image):
-        print (image)
         model_type = g.config['edgetpu_mobilenet_ssd_type']
         if model_type == 'v1':
             model_file_abs_path = g.config['edgetpu_mobilenet_ssd_model_v1']
